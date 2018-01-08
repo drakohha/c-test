@@ -22,7 +22,8 @@ public:
 	Key GetKey()const;
 	Value GetValue() const;
 	void SetValue(Key data, Value data_2);
-	//bool operator<(Tree const& new);
+	Key FindValue(Value data) const;
+	Value FindKey(Key data) const;
 	
 private:
 	TreeItem * _data=nullptr;
