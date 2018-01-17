@@ -5,7 +5,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <sstream>
 
 
 
@@ -22,6 +22,8 @@ void Slovar::Find(std::string key) {
 		}
 	}
 }
+
+
 void Slovar::Dell(std::string key) {
 	for (auto itr = _sl.begin(); itr != _sl.end(); ++itr) {
 		if (itr->first == key) {
@@ -49,6 +51,21 @@ void Slovar::Save(Slovar const& sl) {
 	f.close();
 }
 
+
+void Slovar::Save_2(Slovar const& sl_2) {
+	std::ofstream f_3("test_2.txt");
+
+	for (auto itr = _sl.begin(); itr != _sl.end(); ++itr) {
+
+		f_3 << itr->first;
+		f_3 << std::endl;
+		f_3 << itr->second;
+		f_3 << std::endl;
+	}
+	f_3.close();
+}
+
+
 void Slovar::Load(Slovar& sl) {
 	std::ifstream f_2("test.txt");
 	char buff[100];
@@ -67,6 +84,12 @@ void Slovar::Load(Slovar& sl) {
 	f_2.close();
 }
 
+
+void Slovar::Show(Slovar const& sl_2) {
+	for (auto itr = this->_sl.begin(); itr != this->_sl.end(); ++itr) {
+		std::cout << itr->first << " " << itr->second << std::endl;
+	}
+}
 
 int main() {
 
@@ -127,8 +150,38 @@ int main() {
 
 		}
 		if (flag_menu == 6) {
-		
+			Slovar sl_2;
+			sl_1.Save_2(sl_1);
+			std::ifstream f_4("test.txt");
+			
+			char buff[100];
+			std::ostringstream id_count_s;
+			int id_count=0;
+			std::string key;
+			std::string value;
+			//std::string key_2;
+			while (!f_4.eof()) {
+				f_4 >> key;
+				std::ifstream f_5("test_2.txt");
+				while (!f_5.eof()) {
+					f_5 >> value;
+					if (key == value) {
+						id_count++;
+					}
+				}
+				id_count_s << id_count;
+				//std::ostringstream key_2;
+				//key_2 << id_count;
+				std::string key_2 = id_count_s.str();
+				sl_2.Add(key, key_2);
+				id_count = 0;
+				id_count_s.seekp(SEEK_SET);
+				f_5.close();
 
+			}
+
+			f_4.close();
+			sl_2.Show(sl_2);
 		}
 
 	} while (flag_menu != 0);
