@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
+#include <chrono>
+#include <time.h>
+#include <ctime>
 
 
 Acsess::Acsess(){}
@@ -110,6 +113,14 @@ void Work::Add() {
 	std::cin >> num_type;
 	std::cout << "Vvedite prise = ";
 	std::cin >> prise;
+
+	for (int i = 0; i < GetCount(); i++) {
+		if (_nm[i].GetNomber() == num) {
+			throw("error!");
+			break;
+		}
+	}
+
 	Float fl_1(num,num_type,prise,state);
 	Info_float Ifl_1(start_brone,start_in,start_end,brone);
 	Persone pfl_1("","");
@@ -121,21 +132,29 @@ void Work::Add() {
 
 
 void Work::Add_2(int nom,int nt,int prise,bool state) {
-	int count = GetCount();
-	
-	time_t start_brone = 0;
-	time_t start_in = 0;
-	time_t start_end = 0;
-	bool brone = 0;
-	
 	Float fl_1(nom, nt, prise, state);
-	Info_float Ifl_1(start_brone, start_in, start_end, brone);
-	Persone pfl_1("","");
 	_nm.push_back(fl_1);
-	_ni.push_back(Ifl_1);
-	_np.push_back(pfl_1);
-	ReCount(count + 1);
+	
 }
+
+void Work::Add_3(time_t brone_start, time_t start_in , time_t end_in, bool brone) {
+	
+	Info_float Ifl_1(brone_start, start_in, end_in, brone);
+	_ni.push_back(Ifl_1);
+}
+
+void Work::Add_4(std::string name, std::string sename) {
+	if (name == "none" and sename == "none") {
+		Persone pfl_1("", "");
+		_np.push_back(pfl_1);
+	}
+	else {
+		Persone pfl_1(name, sename);
+		_np.push_back(pfl_1);
+	}
+	
+}
+
 
 
 time_t Info_float::Get_st_brone()const{
@@ -229,6 +248,8 @@ void Work::Save(Work const& nw_1) {
 	std::ofstream f_10("file_2.txt");
 	std::ofstream f_100("file_3.txt");
 	std::ofstream f_1000("file_4.txt");
+	std::ofstream f_count_2("file_5.txt");
+	f_count_2 << GetCount();
 	for (int i = 0; i < GetCount(); i++) {
 		f_10 << _nm[i].GetNomber() << " ";
 		f_10 << _nm[i].GetNT() << " ";
@@ -255,41 +276,147 @@ void Work::Save(Work const& nw_1) {
 	f_10.close();
 	f_100.close();
 	f_1000.close();
-
+	f_count_2.close();
 }
 
 void Work::Load(Work & nw_1) {
 	std::ifstream f_11("file_2.txt");
 	std::ifstream f_111("file_3.txt");
 	std::ifstream f_1111("file_4.txt");
+	std::ifstream f_count("file_5.txt");
 	int nomber;
+	
 	int NT;
 	int prise;
 	bool state;
-	int count = GetCount();
-	while (!f_11.eof()) {
+	int count;
+	f_count >> count;
+	ReCount(count);
+	int count_id = count;
+	bool brone;
+	time_t start_in;
+	time_t end_in;
+	time_t brone_start;
+	std::string name;
+	std::string sename;
+	
+	
+	for(int i=0;i<count_id;i++) {
+
 		f_11 >> nomber;
 		f_11 >> NT;
 		f_11 >> prise;
 		f_11 >> state;
-		//f_111 >> 
+		f_111 >> brone_start;
+		f_111 >> start_in;
+		f_111 >> end_in;
+		f_111 >> brone;
+		f_1111 >> name;
+		f_1111 >> sename;
 		nw_1.Add_2(nomber, NT, prise, state);
-		//nw_1.Add_3();
-		//nw_1.Add_4();
-		ReCount(count + 1);
-		count = GetCount();
+		nw_1.Add_3(brone_start, start_in, end_in, brone);
+		nw_1.Add_4(name, sename);
+		
+		//ReCount(count + 1);
+		//count = GetCount();
 	}
+
 	f_11.close();
 	f_111.close();
 	f_1111.close();
+	f_count.close();
 }
 
+void Work::Show(Work& nw_1)const {
+	std::cout << " nomer = " << nw_1.GetNomber() << " ";
+	std::cout << "kol_mest = " << nw_1.GetNT() << " ";
+	std::cout << " prise = " << nw_1.GetPrise() << std::endl;
+}
+
+void Work::Pers_Find(Work & nw_1) {
+	std::cout << "Vvedite daty zaseleni9 = ";
+	time_t start_in;
+	std::cin >> start_in;
+	std::cout << "Vvedite daty viseleni9 = ";
+	time_t end_in;
+	std::cin >> end_in;
+	std::cout << "Vvedite kol_mest = ";
+	int NT;
+	std::cin >> NT;
+
+	for (int i = 0; i < GetCount(); i++) {
+		if (_nm[i].GetNT() == NT ) {
+			if (_ni[i].Get_brone() == 0 and _nm[i].GetState()==true) {
+				std::cout << " nomer = " << _nm[i].GetNomber() << " ";
+				std::cout << "kol_mest = " << _nm[i].GetNT() << " ";
+				std::cout << " prise = " << _nm[i].GetPrise() << std::endl;
+			}
+			else {
+				if (nw_1.Get_end_in() < start_in) {
+					std::cout << " nomer = " << _nm[i].GetNomber() << " ";
+					std::cout << "kol_mest = " << _nm[i].GetNT() << " ";
+					std::cout << " prise = " << _nm[i].GetPrise() << std::endl;
+				}
+			}
+		}
+	}
+
+}
+
+
+void Info_float::Set_st_brone(time_t start_brone){
+	_start_brone = start_brone;
+}
+void Info_float::Set_st_in(time_t start_in){
+	_start_in = start_in;
+}
+void Info_float::Set_end_in(time_t end_in){
+	_end_in = end_in;
+}
+
+void Work::Pers_brone(Work & nw_1) {
+	std::cout << "Viberete nomer zaseleni9 iz dostupnuh = ";
+	int num;
+	std::cin >> num;
+	std::cout << "Vvedite daty zaseleni9 = ";
+	time_t start_in;
+	std::cin >> start_in;
+	std::cout << "Vvedite daty viseleni9 = ";
+	time_t end_in;
+	std::cin >> end_in;
+	std::cout << "Vedite svoi name = ";
+	std::string name;
+	std::cin >> name;
+	std::cout << "Vedite svoi sename = ";
+	std::string sename;
+	std::cin >> sename;
+
+	for (int i = 0; i < GetCount(); i++) {
+		if (_nm[i].GetNomber() == num) {
+			_ni[i].SetState(true);
+			_ni[i].Set_st_brone(start_in);
+			_ni[i].Set_st_in(start_in);
+			_ni[i].Set_end_in(end_in);
+			//_np[i].Dell("");
+			_np[i].Add(name, sename);
+		}
+	}
+}
 
 int main() {
 	Acsess ac_1;
 	ac_1.Load(ac_1);
 	int flag_menu = 0;
 	int flag_dopusk = 0;
+	//std::chrono::time_point<std::chrono::system_clock> start, end;
+	//start = std::chrono::system_clock::now();
+	//auto current_time = std::chrono::system_clock::now();
+
+	//std::time_t current_time_t = std::chrono::system_clock::to_time_t(current_time);
+
+	//std::cout << std::chrono::system_clock::now() << std::endl;
+	
+
 	do {
 		std::cout << " Vvedite Login i parol vahei y4 zapisi ili sozdaite novuu ." << std::endl;
 		std::cout << "1-voiti , 2-sozdatb, 0-rabotatb" << std::endl;
@@ -345,9 +472,15 @@ int main() {
 			std::cout << "1-dobavit nomer, 2- prosmotr info ,0-vihod" << std::endl;
 			std::cin >> flag_id;
 			if (flag_id == 1) {
-		
-			nw_1.Add();
-			nw_1.Save(nw_1);
+				try {
+					nw_1.Add();
+					nw_1.Save(nw_1);
+				}
+				catch (...) {
+					std::cout << "Error enter! check your info" << std::endl;
+				}
+				
+				
 			}
 			if (flag_id == 2) {
 				int flag_id_2 = 0;
@@ -365,8 +498,23 @@ int main() {
 		} while (flag_id != 0);
 		
 	}
+	if (flag_dopusk == 1) {
+		std::cout << "poli4en dostup polsovatel! " << std::endl;
+		int flag_id = 0;
+		do {
+			std::cout << "1-poisk nomera, 2- brone ,0-vihod" << std::endl;
+			std::cin >> flag_id;
+			if (flag_id == 1) {
+				nw_1.Pers_Find(nw_1);
+			}
+			if (flag_id == 2) {
+				nw_1.Pers_brone(nw_1);
+			}
+			nw_1.Save(nw_1);
+		} while (flag_id != 0);
+	}
 	
-
+	
 
 
 	system("Pause");

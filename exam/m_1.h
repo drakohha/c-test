@@ -45,6 +45,9 @@ public:
 	void Show()const;
 	time_t Get_st_in()const;
 	time_t Get_end_in()const;
+	void Set_st_brone(time_t start_brone);
+	void Set_st_in(time_t start_in);
+	void Set_end_in(time_t end_in);
 private:
 	time_t _start_brone; //data bronirivati9
 	time_t _start_in; // data vseleni9
@@ -76,9 +79,13 @@ public:
 	Work();
 	void Add();
 	void Add_2(int num,int nt,int prise,bool state);
+	void Add_3(time_t brone_start,time_t start_in, time_t end_in ,bool brone);
+	void Add_4(std::string name, std::string sename);
 	void Save(Work const& nw_1);
 	void Load(Work & nw_1);
-	//void Show()const;
+	void Pers_Find(Work & nw_1);
+	void Pers_brone(Work & nw_1);
+	void Show(Work& nw_1)const;
 	void Info_bron()const;
 	void Info_empty()const;
 	int GetCount() const;
