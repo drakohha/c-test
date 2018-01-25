@@ -11,6 +11,7 @@
 #include <ctime>
 
 
+
 Acsess::Acsess(){}
 void Acsess::Load(Acsess& ac_1) {
 	
@@ -119,6 +120,10 @@ void Work::Add() {
 			throw("error!");
 			break;
 		}
+		if (num_type < 1 or num_type>4) {
+			throw("error!");
+			break;
+		}
 	}
 
 	Float fl_1(num,num_type,prise,state);
@@ -192,18 +197,19 @@ void Info_float::Show()const {
 	else {
 		std::cout << " nomer NE zabronirovan ";
 	}
+
+
+
 	std::cout <<" data broni = " <<Get_st_brone() << " ";
 	std::cout <<"data vseleni9 = " << Get_st_in() << " ";
 	std::cout << "data vusileni9 = " << Get_end_in() << std::endl;
 }
 
 std::string Persone::GetName()const{
- auto	itr = _pers.begin();
- return itr->first;
+	return _name;
 }
 std::string Persone::GetSename()const{
-	auto itr = _pers.begin();
-	return itr->second;
+	return _sename;
 }
 
 void Persone::Show()const {
@@ -220,9 +226,33 @@ void Work::Info_bron()const{
 		}
 	}
 }
-void Work::Info_empty()const{
+void Work::Info_empty(time_t new_time)const{
+	time_t start;
+	time_t end;
+	struct tm * f_1;
+	struct tm * f_2;
+	struct tm * f_new;
+
+
 	for (int i = 0; i < GetCount(); i++) {
-		if (_nm[i].GetState() == 1) {
+		start = _ni[i].Get_st_in();
+		end = _ni[i].Get_end_in();
+		f_1 = localtime(&start);
+		f_2 = localtime(&start);
+		f_new = localtime(&new_time);
+
+		if (_nm[i].GetState() == true )  {
+			if (f_new->tm_mday < f_1->tm_mday or f_new->tm_mday > f_2->tm_mday) {
+				if (f_new->tm_mon < f_1->tm_mon or f_new->tm_mon > f_2->tm_mon) {
+					_nm[i].Show();
+					_ni[i].Show();
+					_np[i].Show();
+				}
+			}
+
+			
+		}
+		if (_nm[i].GetState() == true and _ni[i].Get_st_in()==0) {
 			_nm[i].Show();
 			_ni[i].Show();
 			_np[i].Show();
@@ -233,14 +263,17 @@ void Work::Info_empty()const{
 
 Persone::Persone(){}
 Persone::Persone(std::string name, std::string sename) {
-		_pers[name] = sename;
+	_name = name;
+	_sename = sename;
 }
 	
 void Persone::Add(std::string name, std::string sename) {
-	_pers[name] = sename;
+	_name = name;
+	_sename = sename;
 }
 void Persone::Dell(std::string name) {
-	_pers[name].pop_back();
+	_name = "";
+	_sename = "";
 }
 
 
@@ -254,11 +287,13 @@ void Work::Save(Work const& nw_1) {
 		f_10 << _nm[i].GetNomber() << " ";
 		f_10 << _nm[i].GetNT() << " ";
 		f_10 << _nm[i].GetPrise() << " ";
-		f_10 << _nm[i].GetState() << " ";
-		f_100 << _ni[i].Get_brone() << " ";
+		f_10 << _nm[i].GetState() << std::endl;
 		f_100 << _ni[i].Get_st_brone() << " ";
 		f_100 << _ni[i].Get_st_in() << " ";
 		f_100 << _ni[i].Get_end_in() << " ";
+		f_100 << _ni[i].Get_brone() << std::endl;
+		
+		
 		if (_np[i].GetName() == "") {
 			f_1000 << "none" << " ";
 		}
@@ -266,7 +301,7 @@ void Work::Save(Work const& nw_1) {
 			f_1000 << _np[i].GetName() << " ";
 		}
 		if (_np[i].GetSename()== "") {
-			f_1000 << _np[i].GetSename() << std::endl;
+			f_1000 << "none" << std::endl;
 		}
 		else {
 			f_1000 << _np[i].GetSename() << std::endl;
@@ -374,47 +409,134 @@ void Info_float::Set_end_in(time_t end_in){
 	_end_in = end_in;
 }
 
+void Info_float::Set_brone(bool brone) {
+	_brone = brone;
+}
 void Work::Pers_brone(Work & nw_1) {
+	struct tm * in;
+	struct tm * end;
+	time_t now;
+	time(&now);
 	std::cout << "Viberete nomer zaseleni9 iz dostupnuh = ";
 	int num;
 	std::cin >> num;
-	std::cout << "Vvedite daty zaseleni9 = ";
+	std::cout << "Vvedite daty zaseleni9 : ";
+	std::cout << "viberete month(0-11) = ";
+	int month;
+	int day;
+	try {
+		std::cin >> month;
+		if (month < 0 or month >11) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+	std::cout << "viberete day(1-31) = ";
+	
+	try {
+		std::cin >> day;
+		if (day < 1 or day >31) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+	
+	
+	in = localtime(&now);
+	in->tm_mon = month;
+	in->tm_mday = day;
 	time_t start_in;
-	std::cin >> start_in;
+	start_in = mktime(in);
 	std::cout << "Vvedite daty viseleni9 = ";
+	try {
+		std::cout << "viberete month(0-11) = ";
+		std::cin >> month;
+		if (month < 0 or month >11) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+	std::cout << "viberete day(1-31) = ";
+
+	try {
+		std::cin >> day;
+		if (day < 1 or day >31) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+	end = localtime(&now);
+	end->tm_mon = month;
+	end->tm_mday = day;
+
+
 	time_t end_in;
-	std::cin >> end_in;
+	end_in = mktime(end);
 	std::cout << "Vedite svoi name = ";
 	std::string name;
 	std::cin >> name;
 	std::cout << "Vedite svoi sename = ";
 	std::string sename;
 	std::cin >> sename;
+	int flag_ide = 0;
 
 	for (int i = 0; i < GetCount(); i++) {
-		if (_nm[i].GetNomber() == num) {
-			_ni[i].SetState(true);
+		if (_nm[i].GetNomber() == num and _nm[i].GetState()==true) {
+			_nm[i].SetState(0);
+			_ni[i].Set_brone(true);
 			_ni[i].Set_st_brone(start_in);
 			_ni[i].Set_st_in(start_in);
 			_ni[i].Set_end_in(end_in);
-			//_np[i].Dell("");
 			_np[i].Add(name, sename);
+			flag_ide = 1;
 		}
+	}
+	if (flag_ide == 0) {
+		throw("Error!");
 	}
 }
 
+
+
 int main() {
+	setlocale(LC_ALL, "Russian");
 	Acsess ac_1;
 	ac_1.Load(ac_1);
 	int flag_menu = 0;
 	int flag_dopusk = 0;
-	//std::chrono::time_point<std::chrono::system_clock> start, end;
-	//start = std::chrono::system_clock::now();
-	//auto current_time = std::chrono::system_clock::now();
 
-	//std::time_t current_time_t = std::chrono::system_clock::to_time_t(current_time);
+	
+	struct tm * timeinfo;
+	time_t now;
+	time(&now);
+	timeinfo = localtime(&now);   // получить текущую дату
 
-	//std::cout << std::chrono::system_clock::now() << std::endl;
+	//struct tm * timeinfo;
+	/*
+	
+	time(&now);                              
+	timeinfo = localtime(&now);
+	std::cout << "Текущее локальное время и дата " << asctime(timeinfo);
+	std::cout << now << std::endl;
+	struct tm * timeinfo_2;
+	timeinfo_2 = localtime(&now);
+	timeinfo_2->tm_mday = 15;
+	timeinfo_2->tm_mon = 5;
+	now = mktime(timeinfo_2);
+	timeinfo_2 = localtime(&now);
+	std::cout << "nova9 data " << asctime(timeinfo_2) << std::endl;
+	now = mktime(timeinfo_2);
+	std::cout << now << std::endl;
+	*/
+	
 	
 
 	do {
@@ -491,7 +613,38 @@ int main() {
 						nw_1.Info_bron();
 					}
 					if (flag_id_2 == 2) {
-						nw_1.Info_empty();
+						std::cout << " vibere datu poiska : " << std::endl;
+						std::cout << "viberete month(0-11) = ";
+						int month;
+						try {
+							std::cin >> month;
+							if (month < 0 or month >11) {
+								throw("Enter error!");
+							}
+						}
+						catch (...) {
+							std::cout << "enter error!" << std::endl;
+						}
+						std::cout << "viberete day(1-31) = ";
+						int day;
+						try {
+							std::cin >> day;
+							if (day < 1 or day >31) {
+								throw("Enter error!");
+							}
+						}
+						catch (...) {
+							std::cout << "enter error!" << std::endl;
+						}
+
+						struct tm * newinfo;
+						newinfo= localtime(&now);
+						newinfo->tm_mon = month;
+						newinfo->tm_mday = day;
+
+						time_t  new_time;
+						new_time = mktime(newinfo);
+						nw_1.Info_empty(new_time);
 					}
 				} while (flag_id_2 != 0);
 			}
@@ -508,7 +661,13 @@ int main() {
 				nw_1.Pers_Find(nw_1);
 			}
 			if (flag_id == 2) {
-				nw_1.Pers_brone(nw_1);
+				try {
+					nw_1.Pers_brone(nw_1);
+				}
+				catch (...) {
+					std::cout << "Error enter! check info enter!" << std::endl;
+				}
+				
 			}
 			nw_1.Save(nw_1);
 		} while (flag_id != 0);

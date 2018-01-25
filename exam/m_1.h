@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <ctime>
 
 class Acsess {
 public:
@@ -45,6 +46,7 @@ public:
 	void Show()const;
 	time_t Get_st_in()const;
 	time_t Get_end_in()const;
+	void Set_brone(bool brone);
 	void Set_st_brone(time_t start_brone);
 	void Set_st_in(time_t start_in);
 	void Set_end_in(time_t end_in);
@@ -67,7 +69,8 @@ public:
 	std::string GetSename()const;
 	
 private:
-	std::map<std::string, std::string> _pers;
+	std::string _name;
+	std::string _sename;
 };
 
 
@@ -87,7 +90,7 @@ public:
 	void Pers_brone(Work & nw_1);
 	void Show(Work& nw_1)const;
 	void Info_bron()const;
-	void Info_empty()const;
+	void Info_empty(time_t new_time)const;
 	int GetCount() const;
 	void ReCount(int count);
 private:
