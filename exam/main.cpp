@@ -13,7 +13,7 @@
 
 
 Acsess::Acsess(){}
-void Acsess::Load(Acsess& ac_1) {
+void Acsess::Load(Acsess& ac_1) {  //zagruzka spiska dostupnuh loginof
 	
 	std::ifstream f_1("file_1.txt");
 	std::string login;
@@ -27,7 +27,7 @@ void Acsess::Load(Acsess& ac_1) {
 	
 	f_1.close();
 }
-void Acsess::Save(Acsess const& ac_1){
+void Acsess::Save(Acsess const& ac_1){   // sohranenie novih loginov
 	std::ofstream f_2("file_1.txt");
 	for (auto itr = this->_ac.begin(); itr != this->_ac.end(); ++itr) {
 		f_2 << itr->first <<" ";
@@ -35,12 +35,12 @@ void Acsess::Save(Acsess const& ac_1){
 	}
 	f_2.close();
 }
-void Acsess::Add(std::string login, std::string Password) {
+void Acsess::Add(std::string login, std::string Password) {  // dobavlenie novogo logina
 	_ac[login] = Password;
 }
 
 
-int Acsess::Find(std::string login,std::string Password) {
+int Acsess::Find(std::string login,std::string Password) {  // poisk dostupnuh loginov a takhe vstroenii admin login
 	int flag = 0;
 	if (login == "admin" and Password == "admin") {
 		return 66;
@@ -54,11 +54,12 @@ int Acsess::Find(std::string login,std::string Password) {
 		}
 
 	}
-	if (flag == 0) {
+	if (flag != 1) {
 		std::cout << "Acsess denaied!" << std::endl;
 		throw ("Erorr");
 		return 0;
 	}
+	return -1;
 }
 
 
@@ -98,7 +99,7 @@ int Work::GetCount() const {
 void Work::ReCount(int count) {
 	_count = count;
 }
-void Work::Add() {
+void Work::Add() {   // sozdanie novogo nomera 
 	int count = GetCount();
 	int num;
 	int num_type;
@@ -136,19 +137,19 @@ void Work::Add() {
 }
 
 
-void Work::Add_2(int nom,int nt,int prise,bool state) {
+void Work::Add_2(int nom,int nt,int prise,bool state) {   // sozdanie nomera dl9 raboti iz faila
 	Float fl_1(nom, nt, prise, state);
 	_nm.push_back(fl_1);
 	
 }
 
-void Work::Add_3(time_t brone_start, time_t start_in , time_t end_in, bool brone) {
+void Work::Add_3(time_t brone_start, time_t start_in , time_t end_in, bool brone) {  // sozdani info o nomere dl9 raboti iz faila
 	
 	Info_float Ifl_1(brone_start, start_in, end_in, brone);
 	_ni.push_back(Ifl_1);
 }
 
-void Work::Add_4(std::string name, std::string sename) {
+void Work::Add_4(std::string name, std::string sename) {  // sozdain9 spiska klientov dl9 raboti iz nomera
 	if (name == "none" and sename == "none") {
 		Persone pfl_1("", "");
 		_np.push_back(pfl_1);
@@ -169,7 +170,7 @@ bool Info_float::Get_brone()const{
 	return _brone;
 }
 
-void Float::Show()const {
+void Float::Show()const {  // pokaz info o nomere
 	std::cout <<" nomer = " << GetNomber() << " ";
 	std::cout << "kol_mest = "<<GetNT() << " ";
 	std::cout <<" prise = "  << GetPrise() << " ";
@@ -189,7 +190,7 @@ time_t Info_float::Get_end_in()const {
 	return _end_in;
 }
 
-void Info_float::Show()const {
+void Info_float::Show()const {   // pokaz dopolniteknoi info o nomere
 	if (Get_brone() == 1) {
 		std::cout << " nomer zabronirovan ";
 
@@ -198,11 +199,38 @@ void Info_float::Show()const {
 		std::cout << " nomer NE zabronirovan ";
 	}
 
-
-
-	std::cout <<" data broni = " <<Get_st_brone() << " ";
-	std::cout <<"data vseleni9 = " << Get_st_in() << " ";
-	std::cout << "data vusileni9 = " << Get_end_in() << std::endl;
+	
+	struct tm * st_brone;
+	struct tm * st_in;
+	struct tm * end_in;
+	time_t st_brone_tm;
+	time_t st_in_tm;
+	time_t end_in_tm;
+	st_brone_tm = Get_st_brone();
+	st_in_tm = Get_st_in();
+	end_in_tm = Get_end_in();
+	st_brone = localtime(&st_brone_tm);
+	st_in = localtime(&st_in_tm);
+	end_in = localtime(&end_in_tm);
+	if (st_brone_tm == 0) {
+		std::cout << "data broni = nety" << std::endl;
+	}
+	else {
+		std::cout <<" data broni = " <<asctime(st_brone) << std::endl;
+	}
+	if (st_in_tm == 0) {
+		std::cout << "data vseleni9 =  nety " << std::endl;
+	}
+	else {
+		std::cout <<"data vseleni9 = " << asctime(st_in) << std::endl;
+	}
+	if (end_in_tm == 0) {
+		std::cout << "data vusileni9 = nety " << std::endl;
+	}
+	else {
+		std::cout << "data vusileni9 = " <<asctime(end_in)  << std::endl;
+	}
+	
 }
 
 std::string Persone::GetName()const{
@@ -212,12 +240,12 @@ std::string Persone::GetSename()const{
 	return _sename;
 }
 
-void Persone::Show()const {
+void Persone::Show()const {   // pokaz klienta nomera esli estb
 	std::cout <<" name = " <<GetName() << " ";
 	std::cout <<" sename = " <<GetSename() << std::endl;
 }
 
-void Work::Info_bron()const{
+void Work::Info_bron()const{  // prosmotr info o zabronirovanih nomerah
 	for (int i = 0; i < GetCount(); i++) {
 		if (_ni[i].Get_brone() == true) {
 			_nm[i].Show();
@@ -226,7 +254,7 @@ void Work::Info_bron()const{
 		}
 	}
 }
-void Work::Info_empty(time_t new_time)const{
+void Work::Info_empty(time_t new_time)const{  // prosmotr info o pustuh nomerah po date
 	time_t start;
 	time_t end;
 	struct tm * f_1;
@@ -277,7 +305,7 @@ void Persone::Dell(std::string name) {
 }
 
 
-void Work::Save(Work const& nw_1) {
+void Work::Save(Work const& nw_1) {  //sohranenie vsego po raznim failam
 	std::ofstream f_10("file_2.txt");
 	std::ofstream f_100("file_3.txt");
 	std::ofstream f_1000("file_4.txt");
@@ -314,7 +342,7 @@ void Work::Save(Work const& nw_1) {
 	f_count_2.close();
 }
 
-void Work::Load(Work & nw_1) {
+void Work::Load(Work & nw_1) {   // zagruzka iz failov svei info
 	std::ifstream f_11("file_2.txt");
 	std::ifstream f_111("file_3.txt");
 	std::ifstream f_1111("file_4.txt");
@@ -352,8 +380,7 @@ void Work::Load(Work & nw_1) {
 		nw_1.Add_3(brone_start, start_in, end_in, brone);
 		nw_1.Add_4(name, sename);
 		
-		//ReCount(count + 1);
-		//count = GetCount();
+		
 	}
 
 	f_11.close();
@@ -362,19 +389,84 @@ void Work::Load(Work & nw_1) {
 	f_count.close();
 }
 
-void Work::Show(Work& nw_1)const {
+void Work::Show(Work& nw_1)const {  // pokaz info o nomere
 	std::cout << " nomer = " << nw_1.GetNomber() << " ";
 	std::cout << "kol_mest = " << nw_1.GetNT() << " ";
 	std::cout << " prise = " << nw_1.GetPrise() << std::endl;
 }
 
-void Work::Pers_Find(Work & nw_1) {
-	std::cout << "Vvedite daty zaseleni9 = ";
+void Work::Pers_Find(Work & nw_1) {   //poisk nomerov po zadanim parametram
+	
+	struct tm * end;
+	struct tm * now_time;
+	struct tm * in;
+	int month;
+	int day;
+	time_t now;
+	time(&now);
+	now_time = localtime(&now);
 	time_t start_in;
-	std::cin >> start_in;
-	std::cout << "Vvedite daty viseleni9 = ";
 	time_t end_in;
-	std::cin >> end_in;
+	time_t start_else;
+	std::cout << "Vvedite daty zaseleni9 = ";
+	std::cout << "viberete month(0-11) = ";
+	
+	try {
+		std::cin >> month;
+		if (month < 0 or month >11) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+	std::cout << "viberete day(1-31) = ";
+
+	try {
+		std::cin >> day;
+		if (day < 1 or day >31) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+
+	in = localtime(&now);
+	in->tm_mon = month;
+	in->tm_mday = day;
+	start_in = mktime(in);
+	
+	std::cout << "Vvedite daty viseleni9 = ";
+	std::cout << "viberete month(0-11) = ";
+
+	try {
+		std::cin >> month;
+		if (month < 0 or month >11) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+	std::cout << "viberete day(1-31) = ";
+
+	try {
+		std::cin >> day;
+		if (day < 1 or day >31) {
+			throw("Enter error!");
+		}
+	}
+	catch (...) {
+		std::cout << "enter error!" << std::endl;
+	}
+
+	end = localtime(&now);
+	end->tm_mon = month;
+	end->tm_mday = day;
+	end_in = mktime(end);
+
+	
 	std::cout << "Vvedite kol_mest = ";
 	int NT;
 	std::cin >> NT;
@@ -387,10 +479,29 @@ void Work::Pers_Find(Work & nw_1) {
 				std::cout << " prise = " << _nm[i].GetPrise() << std::endl;
 			}
 			else {
-				if (nw_1.Get_end_in() < start_in) {
+				if (nw_1.Get_end_in() == 0) {
 					std::cout << " nomer = " << _nm[i].GetNomber() << " ";
 					std::cout << "kol_mest = " << _nm[i].GetNT() << " ";
 					std::cout << " prise = " << _nm[i].GetPrise() << std::endl;
+				}
+				else {
+					struct tm * end_in;
+					start_else = nw_1.Get_end_in();
+					time_t start_else_2;
+					start_else_2 = nw_1.Get_st_in();
+					end_in = localtime(&start_else);
+					struct tm * in_in;
+					in_in = localtime(&start_else_2);
+					if (end_in->tm_mday < in->tm_mday and end_in->tm_mon <= in->tm_mon) {
+						std::cout << " nomer = " << _nm[i].GetNomber() << " ";
+						std::cout << "kol_mest = " << _nm[i].GetNT() << " ";
+						std::cout << " prise = " << _nm[i].GetPrise() << std::endl;
+					}
+					else if (end->tm_mday > in_in->tm_mday and  end->tm_mon >= in_in->tm_mon) {
+						std::cout << " nomer = " << _nm[i].GetNomber() << " ";
+						std::cout << "kol_mest = " << _nm[i].GetNT() << " ";
+						std::cout << " prise = " << _nm[i].GetPrise() << std::endl;
+					}
 				}
 			}
 		}
@@ -412,7 +523,7 @@ void Info_float::Set_end_in(time_t end_in){
 void Info_float::Set_brone(bool brone) {
 	_brone = brone;
 }
-void Work::Pers_brone(Work & nw_1) {
+void Work::Pers_brone(Work & nw_1) {  // bronirovani nomera
 	struct tm * in;
 	struct tm * end;
 	time_t now;
@@ -517,25 +628,9 @@ int main() {
 	struct tm * timeinfo;
 	time_t now;
 	time(&now);
-	timeinfo = localtime(&now);   // получить текущую дату
+	timeinfo = localtime(&now);   // poluch tek daty
 
-	//struct tm * timeinfo;
-	/*
 	
-	time(&now);                              
-	timeinfo = localtime(&now);
-	std::cout << "Текущее локальное время и дата " << asctime(timeinfo);
-	std::cout << now << std::endl;
-	struct tm * timeinfo_2;
-	timeinfo_2 = localtime(&now);
-	timeinfo_2->tm_mday = 15;
-	timeinfo_2->tm_mon = 5;
-	now = mktime(timeinfo_2);
-	timeinfo_2 = localtime(&now);
-	std::cout << "nova9 data " << asctime(timeinfo_2) << std::endl;
-	now = mktime(timeinfo_2);
-	std::cout << now << std::endl;
-	*/
 	
 	
 
@@ -543,7 +638,7 @@ int main() {
 		std::cout << " Vvedite Login i parol vahei y4 zapisi ili sozdaite novuu ." << std::endl;
 		std::cout << "1-voiti , 2-sozdatb, 0-rabotatb" << std::endl;
 		std::cin >> flag_menu;
-		if (flag_menu == 1) {
+		if (flag_menu == 1) { // popitka vhoda na ych zapis
 			int flag_id = 0;
 			do {
 				std::string login;
@@ -558,14 +653,14 @@ int main() {
 				catch(...){
 					std::cout << "Error enter or this login not exsist" << std::endl;
 					system("Pause");
-					//flag_menu = 0;
+					
 				}
 				
 				
 
 			} while (flag_id != 0);
 		}
-		if (flag_menu == 2) {
+		if (flag_menu == 2) { // sozdanie novoi ych zapisi
 			std::string login;
 			std::string Password;
 			std::cout << " Login = ";
@@ -577,26 +672,29 @@ int main() {
 		}
 	} while (flag_menu != 0);
 
-	if (flag_dopusk == 0) {
+	if (flag_dopusk == 0) { // variant vihoda iz programi
 		std::cout << "You not enter , program close." << std::endl;
 		system("Pause");
 		return 0;
 	}
 	
 	Work nw_1;
-	nw_1.Load(nw_1);
+	nw_1.Load(nw_1);  // zagruzka vseh dannih pered nacalom raboti ych zapisi
 	
 	if (flag_dopusk == 66) {
 		
 		std::cout << "poli4en dostup admin! " << std::endl;
 		int flag_id = 0;
 		do {
+			
 			std::cout << "1-dobavit nomer, 2- prosmotr info ,0-vihod" << std::endl;
 			std::cin >> flag_id;
 			if (flag_id == 1) {
 				try {
 					nw_1.Add();
 					nw_1.Save(nw_1);
+					system("cls");
+					std::cout << " nomer bul yspehno dobavlen" << std::endl;
 				}
 				catch (...) {
 					std::cout << "Error enter! check your info" << std::endl;
@@ -605,8 +703,10 @@ int main() {
 				
 			}
 			if (flag_id == 2) {
+				system("cls");
 				int flag_id_2 = 0;
 				do { 
+					
 					std::cout << "viberete : 1- info broni, 2- info svobodnih nomerov po date,0-vihod" << std::endl;
 					std::cin >> flag_id_2;
 					if (flag_id_2 == 1) {
@@ -647,6 +747,7 @@ int main() {
 						nw_1.Info_empty(new_time);
 					}
 				} while (flag_id_2 != 0);
+				system("cls");
 			}
 		} while (flag_id != 0);
 		
@@ -658,9 +759,11 @@ int main() {
 			std::cout << "1-poisk nomera, 2- brone ,0-vihod" << std::endl;
 			std::cin >> flag_id;
 			if (flag_id == 1) {
+				system("cls");
 				nw_1.Pers_Find(nw_1);
 			}
 			if (flag_id == 2) {
+				system("cls");
 				try {
 					nw_1.Pers_brone(nw_1);
 				}
